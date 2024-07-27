@@ -81,7 +81,7 @@ def main():
         compact = 1
         
         query_params = {
-            "info_hash": urllib.parse.quote(info_hash),
+            "info_hash": urllib.parse.quote(info_hash, safe=''),
             "peer_id": peer_id,
             "port": port,
             "uploaded": uploaded,
@@ -92,6 +92,11 @@ def main():
         
         response = requests.get(tracker_url, params=query_params)
         response_data = bencodepy.decode(response.content)
+        
+        if b"peers" not in response_data:
+            print("No peers found")
+            return
+        
         peers = response_data[b"peers"]
         
         peer_list = []
