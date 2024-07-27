@@ -68,7 +68,10 @@ def main():
             content = file.read()
         decoded_content = bencodepy.decode(content)
         info = decoded_content[b"info"]
-        info_hash = hashlib.sha1(bencodepy.encode(info)).digest()
+        info_hash = hashlib.sha1(bencodepy.encode(info)).digest()  # 20-byte binary value
+        
+        print(f"Debug: Raw info_hash: {info_hash} (length: {len(info_hash)})")
+        
         tracker_url = decoded_content[b"announce"].decode()
         total_length = info[b"length"]
         
@@ -89,7 +92,11 @@ def main():
             "compact": compact
         }
         
+        print(f"Debug: Query params: {query_params}")
+        
         response = requests.get(tracker_url, params=query_params)
+        print(f"Debug: Tracker response: {response.content}")
+        
         response_data = bencodepy.decode(response.content)
         
         if b"peers" not in response_data:
