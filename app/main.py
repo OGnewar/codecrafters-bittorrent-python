@@ -1,7 +1,7 @@
 import json
 import sys
 
-import bencodepy # available if you need it!
+from bencodepy import Bencode # available if you need it!
 #import requests - available if you need it!
 
 # Examples:
@@ -14,12 +14,15 @@ def decode_bencode(bencoded_value):
         if first_colon_index == -1:
             raise ValueError("Invalid encoded value")
         return bencoded_value[first_colon_index+1:]
-    #accept integer
-    elif chr(bencoded_value[0]) == "i":
+    #accept integers
+    elif chr(bencoded_value[0]) == "i" and chr(bencoded_value[-1]) == "e":
         return int(bencoded_value[1:-1])
-    #accept dictionary and lists
-    elif chr(bencoded_value[0]) == "d" or chr(bencoded_value[0]) == "l":
-        return bencodepy.decode(bencoded_value)
+    #accept lists
+    elif chr(bencoded_value[0]) == "l" and chr(bencoded_value[-1]) == "e":
+        return Bencode("utf-8").decode(bencoded_value)
+    #accept dictionary
+    elif chr(bencoded_value[0]) == "d" and chr(bencoded_value[-1]) == "e":
+        return Bencode("utf-8").decode(bencoded_value)
     else:
         raise NotImplementedError("Only strings are supported at the moment")
         #return bencodepy.decode(bencoded_value)
