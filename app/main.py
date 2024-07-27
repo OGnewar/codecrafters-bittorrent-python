@@ -41,7 +41,6 @@ def main():
 
     if command == "decode":
         bencoded_value = sys.argv[2].encode()
-        
         print(json.dumps(decode_bencode(bencoded_value), default=bytes_to_str))
     elif command == "info":
         torrent_file_path = sys.argv[2]
@@ -81,7 +80,7 @@ def main():
         compact = 1
         
         query_params = {
-            "info_hash": urllib.parse.quote(info_hash, safe=''),
+            "info_hash": urllib.parse.quote_from_bytes(info_hash),
             "peer_id": peer_id,
             "port": port,
             "uploaded": uploaded,
