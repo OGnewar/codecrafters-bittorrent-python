@@ -48,6 +48,13 @@ def main():
             raise TypeError(f"Type not serializable: {type(data)}")
 
         print(json.dumps(decode_bencode(bencoded_value), default=bytes_to_str))
+    elif command == "info":
+        file_name = sys.argv[2]
+        with open(file_name, "rb") as torrent_file:
+            bencoded_content = torrent_file.read()
+        torrent = decode_bencode(bencoded_content)
+        print("Tracker URL:", torrent["announce"].decode())
+        print("Length:", torrent["info"]["length"])
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
