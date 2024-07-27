@@ -1,7 +1,7 @@
 import json
 import sys
 
-#import bencodepy - available if you need it!
+import bencodepy # available if you need it!
 #import requests - available if you need it!
 
 # Examples:
@@ -17,7 +17,8 @@ def decode_bencode(bencoded_value):
     elif chr(bencoded_value[0]) == "i":
         return int(bencoded_value[1:-1])
     else:
-        raise NotImplementedError("Only strings are supported at the moment")
+        #raise NotImplementedError("Only strings are supported at the moment")
+        return bencodepy.decode(bencoded_value)
 
 
 def main():
