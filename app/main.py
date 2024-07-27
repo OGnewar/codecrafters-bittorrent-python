@@ -2,6 +2,8 @@ import json
 import sys
 import hashlib
 import bencodepy
+import requests
+import urllib.parse
 
 bc = bencodepy.Bencode(encoding="utf-8")
 
@@ -61,6 +63,45 @@ def main():
         print("Piece Hashes:")
         for piece_hash in piece_hashes:
             print(piece_hash)
+    elif command == "peers":
+        torrent_file_path = sys.argv[2]
+        with open(torrent_file_path, "rb") as file:
+            content = file.read()
+        decoded_content = bencodepy.decode(content)
+        info = decoded_content[b"info"]
+        info_hash = hashlib.sha1(bencodepy.encode(info)).digest()
+        tracker_url = decoded_content[b"announce"].decode()
+        total_length = info[b"length"]
+        
+        peer_id = "00112233445566778899"
+        port = 6881
+        uploaded = 0
+        downloaded = 0
+        left = total_length
+        compact = 1
+        
+        query_params = {
+            "info_hash": urllib.parse.quote(info_hash),
+            "peer_id": peer_id,
+            "port": port,
+            "uploaded": uploaded,
+            "downloaded": downloaded,
+            "left": left,
+            "compact": compact
+        }
+        
+        response = requests.get(tracker_url, params=query_params)
+        response_data = bencodepy.decode(response.content)
+        peers = response_data[b"peers"]
+        
+        peer_list = []
+        for i in range(0, len(peers), 6):
+            ip = ".".join(map(str, peers[i:i+4]))
+            port = int.from_bytes(peers[i+4:i+6], byteorder='big')
+            peer_list.append(f"{ip}:{port}")
+        
+        for peer in peer_list:
+            print(peer)
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
